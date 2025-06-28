@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: api-gateway
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      routes:
+        # MICRO-AUTH
+        - id: micro-auth
+          uri: lb://micro-auth
+          predicates:
+            - Path=/api/auth/**
+        # MICRO-USERS (maneja usuarios, roles, permisos)
+        - id: micro-users-users
+          uri: lb://micro-users
+          predicates:
+            - Path=/api/users/**
+            - Path=/api/roles/**
+            - Path=/api/roles/*/permissions/**
+            - Path=/api/permissions/**
+        # MICRO-PRODUCTS (maneja inventario, productos, reportes, ventas)
+        - id: micro-products
+          uri: lb://micro-products
+          predicates:
+            - Path=/api/products/**
+            - Path=/api/authors/**
+            - Path=/api/categories/**
+            - Path=/api/editorials/**
+            - Path=/api/inventory/**
+            - Path=/api/stock-movements/**
+            - Path=/api/reports/**
+            - Path=/api/sales/**
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    registry-fetch-interval-seconds: 5
+    initial-instance-info-replication-interval-seconds: 5
+
+jwt:
+  secret: 08725e547914eb52b7abba9bdfe7be4a2a5e6b8d9ca977d84a20816ff4f5023c
+  expiration-ms: 3600000
+
+logging:
+  level:
+    pe.jesusamigo.api_gateway.filter: TRACE
+    org.springframework.web.server: DEBUG
+    org.springframework.security: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: micro-auth
+  datasource:
+    url: jdbc:does-not-need-db
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+server:
+  port: 8700
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    registry-fetch-interval-seconds: 5
+    initial-instance-info-replication-interval-seconds: 5
+
+jwt:
+  secret: 08725e547914eb52b7abba9bdfe7be4a2a5e6b8d9ca977d84a20816ff4f5023c
+  expiration-ms: 3600000
